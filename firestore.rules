@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// 캠핑카라이프 Firestore 보안 규칙이에요.
+// - 콘텐츠(차박지 · 축제 · 영상 · 게시판 글 · 설정)는 누구나 읽고, admins/{uid}에 있는 관리자만 써요.
+// - 댓글 · 닉네임 · 신고는 없어요 (2026-11-14). 여기 없는 컬렉션은 아무도 읽고 쓰지 못해요.
+// 바꾼 뒤에는 Firebase 콘솔 > Firestore > 규칙에 붙여 넣고 게시해요.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false; // 관리자는 Firebase 콘솔에서만 추가해요.
+    }
+
+    match /spots/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /festivals/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /videos/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /posts/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /config/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

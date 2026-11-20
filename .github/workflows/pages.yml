@@ -1,0 +1,54 @@
+name: Pages
+
+# main에 올리면 웹 버전(vite build --mode web)을 만들어 GitHub Pages에 올려요.
+# VITE_ 값은 저장소 Variables에 있어요. 모두 브라우저에 그대로 나가는 공개 키예요 (쓰기는 Firestore 규칙이 막아요).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_KAKAO_APP_KEY: ${{ vars.VITE_KAKAO_APP_KEY }}
+      VITE_GCAL_API_KEY: ${{ vars.VITE_GCAL_API_KEY }}
+      VITE_GCAL_CALENDAR_ID: ${{ vars.VITE_GCAL_CALENDAR_ID }}
+      VITE_TRANSLATE_URL: ${{ vars.VITE_TRANSLATE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:web
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

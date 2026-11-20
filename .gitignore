@@ -1,0 +1,11 @@
+node_modules
+dist
+*.ait
+.DS_Store
+.env
+dist-web
+# 로컬에만 두는 파일 (공개 저장소에 올리지 않아요)
+PLAN.md
+wireframe.html
+assets/qr-*.png
+scripts/tour-raw/
