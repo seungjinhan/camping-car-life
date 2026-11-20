@@ -3,6 +3,7 @@ import { useI18n } from "../i18n";
 import { deleteItem, type Kind } from "../lib/admin";
 import { useApp } from "../state";
 import { Sheet, useToast } from "./ui";
+import { IS_WEB } from "../lib/platform";
 
 /** 상세 화면 우상단 ⋯ 메뉴예요. 관리자에게만 보여요. */
 export function AdminActions({ kind, id, onEdit }: { kind: Kind; id: string; onEdit: () => void }) {
@@ -12,7 +13,7 @@ export function AdminActions({ kind, id, onEdit }: { kind: Kind; id: string; onE
   const [isConfirming, setIsConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const { show, toast } = useToast();
-  if (!isAdmin) return null;
+  if (IS_WEB || !isAdmin) return null;
 
   const remove = async () => {
     setBusy(true);

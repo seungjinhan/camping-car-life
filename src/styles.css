@@ -180,8 +180,14 @@ select.input { appearance: auto; padding: 0 10px; }
 .story-card { flex: none; width: 72%; max-width: 300px; scroll-snap-align: start; border: 1px solid var(--line); border-radius: var(--card-radius); background: var(--bg); padding: 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left; }
 .story-card b { font-weight: 600; }
 
-/* 웹 버전(GitHub Pages) 맨 위 줄: 뒤로 · 앱 바로가기. 토스 앱 번들에는 나오지 않아요. */
-.web-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 560px; margin: 0 auto; padding: 8px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
-.web-title { font-size: 0.9375rem; }
-.web-back { border: 0; background: none; padding: 4px 0; font-size: 0.9375rem; color: var(--ink); }
-.web-app-link { flex: none; border-radius: 999px; background: var(--primary); color: var(--on-primary); font-size: 0.8125rem; font-weight: 700; padding: 6px 12px; text-decoration: none; }
+/* 웹 버전(GitHub Pages) 맨 위 앱 바로가기 줄 (퓨처셀프 웹과 같은 모양). 화면과 함께 위로 올라가요. 토스 앱 번들에는 나오지 않아요. */
+.app-link-bar { display: flex; align-items: center; gap: 10px; max-width: 560px; margin: 0 auto; padding: 10px 16px 10px 20px; border-bottom: 1px solid var(--line); background: var(--primary-soft); }
+.app-link-icon { flex: none; border-radius: 8px; }
+.app-link-text { display: flex; flex: 1; min-width: 0; flex-direction: column; font-size: 13px; line-height: 1.35; }
+.app-link-text strong { color: var(--ink); }
+.app-link-text span { color: var(--ink-2); }
+.app-link-button { flex: none; padding: 8px 14px; border-radius: 999px; background: var(--primary); color: var(--on-primary); font-size: 13px; font-weight: 700; text-decoration: none; }
+/* 탭이 아닌 화면의 뒤로 줄이에요 (웹에는 토스 내비게이션 바가 없어서). */
+.web-back { display: block; width: 100%; max-width: 560px; margin: 0 auto; border: 0; border-bottom: 1px solid var(--line); background: var(--bg); padding: 10px 16px; text-align: left; font-size: 0.9375rem; color: var(--ink); }
+.info-row.is-locked { opacity: 0.45; }
+.lock-icon { flex: none; color: var(--ink-2); }

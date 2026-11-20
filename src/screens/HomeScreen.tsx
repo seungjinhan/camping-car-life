@@ -12,6 +12,7 @@ import { eventStart, loadEvents } from "../lib/source";
 import { newestVideoFirst } from "../lib/youtube";
 import { loadTourFestivals, type TourFestival } from "../lib/tour";
 import type { CalendarEvent } from "../lib/types";
+import { IS_WEB } from "../lib/platform";
 
 /** 이번 달과 다음 달에서 아직 지나지 않은 첫 일정이에요. */
 function useNextEvent(): CalendarEvent | null {
@@ -143,7 +144,7 @@ export function HomeScreen() {
         <section>
           <div className="section-head">
             <h2 className="section-title">{t("최근 영상")}</h2>
-            <button type="button" className="link" onClick={() => go({ screen: "videos" })}>{t("전체")} ›</button>
+            {!IS_WEB && <button type="button" className="link" onClick={() => go({ screen: "videos" })}>{t("전체")} ›</button>}
           </div>
           <button type="button" className="plain" onClick={() => go({ screen: "video", id: recentVideos[0].id })}>
             <Thumb youtubeId={recentVideos[0].youtubeId} />

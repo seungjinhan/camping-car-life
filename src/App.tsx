@@ -5,6 +5,7 @@ import { I18nProvider, useI18n } from "./i18n";
 import { checkAdmin } from "./lib/admin";
 import { loadSnapshot } from "./lib/source";
 import { IS_WEB, TOSS_APP_URL } from "./lib/platform";
+import appIcon from "./assets/app-icon.png";
 import type { Theme } from "./lib/theme";
 import type { Language, Snapshot } from "./lib/types";
 import { TAB_SCREENS, type Route, type TabScreen } from "./routes";
@@ -29,18 +30,22 @@ import { TourFestivalScreen, TourPlaceScreen } from "./screens/TourScreens";
 import { VideoScreen } from "./screens/VideoScreen";
 import { VideosScreen } from "./screens/VideosScreen";
 
-/** 웹 버전(GitHub Pages)에만 있는 맨 위 줄이에요. 토스 내비게이션 바가 없어서 뒤로 버튼을 여기 두고, 토스 앱 바로가기를 보여줘요. */
+/** 웹 버전(GitHub Pages)에만 있는 맨 위 줄이에요. 퓨처셀프 웹처럼 아이콘 · 앱 이름 · 토스 앱 바로가기를 보여주고 화면과 함께 올라가요.
+ *  토스 내비게이션 바가 없어서, 탭이 아닌 화면에서는 그 아래에 뒤로 줄을 둬요. */
 function WebBar({ canGoBack }: { canGoBack: boolean }) {
   const { t } = useI18n();
   return (
-    <div className="web-bar">
-      {canGoBack ? (
-        <button type="button" className="web-back" onClick={() => history.back()}>‹ {t("뒤로")}</button>
-      ) : (
-        <b className="web-title">{t("캠핑카라이프")}</b>
-      )}
-      <a className="web-app-link" href={TOSS_APP_URL} target="_blank" rel="noopener">{t("앱 바로가기")} ›</a>
-    </div>
+    <>
+      <div className="app-link-bar">
+        <img className="app-link-icon" src={appIcon} alt="" width="32" height="32" />
+        <div className="app-link-text">
+          <strong>{t("캠핑카라이프 앱")}</strong>
+          <span>{t("토스에서 더 편하게 봐요")}</span>
+        </div>
+        <a className="app-link-button" href={TOSS_APP_URL} target="_blank" rel="noopener">{t("앱 바로가기")}</a>
+      </div>
+      {canGoBack && <button type="button" className="web-back" onClick={() => history.back()}>‹ {t("뒤로")}</button>}
+    </>
   );
 }
 
@@ -91,6 +96,8 @@ function AppBody({ initialTheme }: Omit<Props, "initialLanguage">) {
   useEffect(load, [load]);
 
   useEffect(() => {
+    // 웹 버전에는 관리자 기능이 없어요.
+    if (IS_WEB) return setIsAdmin(false);
     checkAdmin().then(setIsAdmin).catch(() => setIsAdmin(false));
   }, []);
 
@@ -138,21 +145,22 @@ function AppBody({ initialTheme }: Omit<Props, "initialLanguage">) {
       case "home": return <HomeScreen />;
       case "spots": return <SpotsScreen />;
       case "explore": return <ExploreScreen />;
-      case "videos": return <VideosScreen />;
-      case "community": return <BoardScreen key="community" board="community" />;
+      // 웹 버전에서 잠근 메뉴(영상 목록 · 소통 · 일정 · 차량관리)와 관리자 화면은 웹 빌드에 넣지 않아요. 혹시 들어오면 홈을 보여줘요.
+      case "videos": return IS_WEB ? <HomeScreen /> : <VideosScreen />;
+      case "community": return IS_WEB ? <HomeScreen /> : <BoardScreen key="community" board="community" />;
       case "more": return <MoreScreen theme={theme} onTheme={setTheme} />;
       case "spot": return <SpotScreen id={route.id} />;
       case "campsite": return <CampsiteScreen province={route.province} id={route.id} />;
       case "festival": return <FestivalScreen id={route.id} />;
       case "tourPlace": return <TourPlaceScreen province={route.province} id={route.id} />;
       case "tourFestival": return <TourFestivalScreen id={route.id} />;
-      case "schedule": return <ScheduleScreen />;
+      case "schedule": return IS_WEB ? <HomeScreen /> : <ScheduleScreen />;
       case "event": return <EventScreen event={route.event} />;
-      case "vehicle": return <BoardScreen key="vehicle" board="vehicle" />;
+      case "vehicle": return IS_WEB ? <HomeScreen /> : <BoardScreen key="vehicle" board="vehicle" />;
       case "story": return <BoardScreen key="story" board="story" />;
       case "post": return <PostScreen id={route.id} />;
       case "video": return <VideoScreen id={route.id} />;
-      default: return isAdmin ? adminBody(route) : isAdmin === null ? <main className="screen"><p className="muted center loading-text">{t("불러오는 중")}</p></main> : <main className="screen"><ErrorState onRetry={() => selectTab("home")} /></main>;
+      default: return IS_WEB ? <HomeScreen /> : isAdmin ? adminBody(route) : isAdmin === null ? <main className="screen"><p className="muted center loading-text">{t("불러오는 중")}</p></main> : <main className="screen"><ErrorState onRetry={() => selectTab("home")} /></main>;
     }
   })();
 
